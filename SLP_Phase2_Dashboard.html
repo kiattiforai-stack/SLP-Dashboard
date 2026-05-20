@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SLP Phase 2 Checklist — Dashboard</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f6f8; color: #1a1a2e; min-height: 100vh; }
+
+  .page { max-width: 960px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+
+  /* Header */
+  .topbar { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 2rem; gap: 12px; }
+  .brand-line { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .brand-dot { width: 4px; height: 36px; background: #378ADD; border-radius: 2px; flex-shrink: 0; }
+  .page-title { font-size: 26px; font-weight: 600; color: #1a1a2e; line-height: 1.2; }
+  .page-sub { font-size: 14px; color: #666; margin-top: 3px; }
+  .live-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: #0F6E56; background: #E1F5EE; padding: 4px 12px; border-radius: 20px; margin-top: 6px; font-weight: 500; }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #1D9E75; animation: blink 2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .refresh-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 8px 18px; border-radius: 8px; border: 1px solid #dde1ea; background: #fff; color: #555; cursor: pointer; white-space: nowrap; flex-shrink: 0; text-decoration: none; transition: background .15s; }
+  .refresh-btn:hover { background: #f0f2f5; }
+
+  /* Stats */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 2rem; }
+  .scard { background: #fff; border-radius: 10px; padding: 16px 18px; border: 1px solid #e8eaf0; }
+  .scard-lbl { font-size: 11px; color: #888; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+  .scard-num { font-size: 32px; font-weight: 600; line-height: 1; }
+  .scard-sub { font-size: 11px; color: #aaa; margin-top: 5px; }
+  .prog-track { background: #f0f2f5; border-radius: 4px; height: 5px; margin-top: 10px; overflow: hidden; }
+  .prog-fill { height: 100%; border-radius: 4px; }
+
+  /* Divider */
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; color: #999; text-transform: uppercase; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 10px; }
+  .section-label::after { content:''; flex:1; height: 1px; background: #e8eaf0; }
+  hr.divider { border: none; border-top: 1px solid #e8eaf0; margin: 0 0 2rem; }
+
+  /* Group cards */
+  .groups-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .group-card { background: #fff; border: 1px solid #e8eaf0; border-radius: 12px; overflow: hidden; }
+  .full-card { background: #fff; border: 1px solid #e8eaf0; border-radius: 12px; overflow: hidden; margin-bottom: 14px; }
+  .group-head { padding: 14px 18px 12px; border-bottom: 1px solid #f0f2f5; display: flex; align-items: center; gap: 10px; }
+  .group-accent { width: 3px; border-radius: 0; align-self: stretch; flex-shrink: 0; }
+  .group-name { font-size: 15px; font-weight: 600; color: #1a1a2e; }
+  .group-area { font-size: 11px; padding: 3px 10px; border-radius: 12px; margin-left: auto; white-space: nowrap; font-weight: 500; }
+  .group-body { padding: 14px 18px; }
+  .group-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .count-conf { font-size: 12px; font-weight: 500; color: #0F6E56; display: flex; align-items: center; gap: 3px; }
+  .count-tbc { font-size: 12px; font-weight: 500; color: #854F0B; display: flex; align-items: center; gap: 3px; }
+  .mini-bar { flex: 1; background: #f0f2f5; border-radius: 3px; height: 4px; overflow: hidden; min-width: 40px; }
+  .mini-fill { height: 100%; border-radius: 3px; }
+  .meta-count { font-size: 11px; color: #aaa; }
+
+  /* Items */
+  .item-list { display: flex; flex-direction: column; gap: 5px; }
+  .items-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+  .item-row { display: flex; align-items: flex-start; gap: 8px; padding: 7px 10px; border-radius: 8px; background: #f8f9fb; border: 1px solid transparent; }
+  .item-row.tbc { background: #fffbf5; border: 1px dashed #e0c88a; }
+  .item-icon { width: 22px; height: 22px; border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; font-size: 11px; }
+  .item-text { font-size: 12px; color: #333; line-height: 1.45; flex: 1; }
+  .item-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; margin-top: 2px; font-weight: 500; }
+  .badge-sep { background: #E1F5EE; color: #0F6E56; }
+  .badge-tbc { background: #FFF3DC; color: #854F0B; }
+
+  /* Footer */
+  .footer { text-align: center; padding: 2rem 0 0; font-size: 12px; color: #bbb; }
+
+  @media (max-width: 640px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .groups-grid { grid-template-columns: 1fr; }
+    .items-wrap { grid-template-columns: 1fr; }
+    .topbar { flex-direction: column; }
+    .page { padding: 1.5rem 1rem 3rem; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="topbar">
+    <div>
+      <div class="brand-line">
+        <div class="brand-dot"></div>
+        <div class="page-title">SLP Phase 2 Checklist</div>
+      </div>
+      <div class="page-sub">Single Loyalty Platform · รายงาน delivery plan</div>
+      <div class="live-pill">
+        <div class="live-dot"></div>
+        ข้อมูล ณ วันที่ <span id="today"></span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+      <button class="refresh-btn" onclick="location.reload()">
+        &#8635; รีเฟรชข้อมูล
+      </button>
+      <a class="refresh-btn" href="https://docs.google.com/spreadsheets/d/1-ApSgYcN3XRXapNEcq7is8Ug_Pj6fFtlR5ZJN6ci1hI/edit" target="_blank">
+        &#8599; เปิด Google Sheet
+      </a>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="scard">
+      <div class="scard-lbl">&#9776; รายการทั้งหมด</div>
+      <div class="scard-num">50</div>
+      <div class="scard-sub">6 กลุ่มงาน</div>
+    </div>
+    <div class="scard">
+      <div class="scard-lbl" style="color:#0F6E56">&#10003; พร้อม 1 Sep 2026</div>
+      <div class="scard-num" style="color:#0F6E56">35</div>
+      <div class="scard-sub">confirmed items</div>
+    </div>
+    <div class="scard">
+      <div class="scard-lbl" style="color:#854F0B">&#9201; รอยืนยัน (TBC)</div>
+      <div class="scard-num" style="color:#854F0B">15</div>
+      <div class="scard-sub">to be confirmed</div>
+    </div>
+    <div class="scard">
+      <div class="scard-lbl">&#9641; ความพร้อมรวม</div>
+      <div class="scard-num">70%</div>
+      <div class="prog-track"><div class="prog-fill" style="width:70%;background:#1D9E75"></div></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <div class="section-label">รายละเอียดแยกตามกลุ่ม</div>
+
+  <div class="groups-grid">
+
+    <!-- TrueCard -->
+    <div class="group-card">
+      <div class="group-head">
+        <div class="group-accent" style="background:#378ADD"></div>
+        <div class="group-name">TrueCard</div>
+        <span class="group-area" style="background:#E6F1FB;color:#185FA5">SLP</span>
+      </div>
+      <div class="group-body">
+        <div class="group-meta">
+          <span class="count-conf">&#10003; 10 confirmed</span>
+          <div class="mini-bar"><div class="mini-fill" style="width:100%;background:#378ADD"></div></div>
+          <span class="meta-count">10/10</span>
+        </div>
+        <div class="item-list">
+          <div class="item-row"><div class="item-icon" style="background:#E6F1FB;color:#185FA5">&#9646;</div><span class="item-text">True Card New Schema (True & Dtac)</span><span class="item-badge badge-sep">1 Sep</span></div>
+          <div class="item-row"><div class="item-icon" style="background:#E6F1FB;color:#185FA5">&#9733;</div><span class="item-text">Super Tier (by invitation only)</span><span class="item-badge badge-sep">1 Sep</span></div>
+          <div class="item-row"><div class="item-icon" style="background:#E6F1FB;color:#185FA5">&#8635;</div><span class="item-text">Remedy maintain tier 12 months</span><span class="item-badge badge-sep">1 Sep</span></div>
+          <div class="item-row"><div class="item-icon" style="background:#E6F1FB;color:#185FA5">&#8593;</div><span class="item-text">Maintain ARPA maintain tier</span><span class="item-badge badge-sep">1 Sep</span></div>
+          <div class="item-row"><div class="item-icon" style="background:#E6F1FB;color:#185FA5">&#128100;</div><span class="item-text">Employee New Criteria (True & Dtac)</span><span class="item-badge badge-sep">1 Sep</span></div>
+          <div class="item-row"><div class="item-icon" style="background:#E6F1FB;color:#185FA5">&#127970;</div><span class="item-text">B2B, Corporate (Dtac)</span><span class="item-badge badge-sep">1 Sep</span></div>
+          <div class="item-row"><div class="item-icon" style="background:#E6F1FB;color:#185FA5">&#9733;</div><span class="item-text">VIP (Dtac)</span><span class="item-badge badge-sep">1 Sep</span></div>
+          <div class="item-row"><div class="item-icon" style="background:#E6F1FB;color:#185FA5">&#9881;</div><span class="item-text">Overrule (Dtac)</span><span class="item-badge badge-sep">1 Sep</span></div>
+          <div class="item-row"><div class="item-icon" style="background:#E6F1FB;color:#185FA5">&#128172;</div><span class="item-text">SMS แจ้งตกเกรด, New, up, down</span><span class="item-badge badge-sep">1 Sep</span></div>
+          <div class="item-row"><div class="item-icon" style="background:#E6F1FB;color:#185FA5">&#128202;</div><span class="item-text">Report Dashboard (Dtac)</span><span class="item-badge badge-sep">1 Sep</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TruePoint -->
+    <div class="group-card">
+      <div class="group-head">
+        <div class="group-accent" style="background:#1D9E75"></div>
+        <div class="group-name">TruePoint</div>
+        <span class="group-area" style="background:#E1F5EE;color:#0F6E56">SLP</span>
+      </div>
+      <div class="group-body">
+        <div class="group-meta">
+          <span class="count-conf">&#10003; 3 confirmed</span>
+          <div class="mini-bar"><div class="mini-fill" style="width:60%;background:#1D9E75"></div></div>
+          <span class="count-tbc">&#9201; 2 TBC</span>
+          <span class="meta-count">3/5</span>
+        </div>
+        <div class="item-list">
+          <div class="item-row"><div class="item-icon" style="background:#E1F5EE;color:#0F6E56">&#8644;</div><span class="item-text">Migrate Dtac Coin to TruePoint</span><span class="item-badge badge-sep">1 Sep</span></div>
+          <div class="item-row"><div class="item-icon" style="background:#E1F5EE;color:#0F6E56">&#128197;</div><span class="item-text">Payment on due (Dtac)</span><span class="item-badge badge-sep">1 Sep</span></div>
+          <div class="item-row"><div class="item-icon" style="background:#E1F5EE;color:#0F6E56">&#128241;</div><span class="item-text">Topping (Dtac)</span><span class="item-badge badge-sep">1 Sep</span></div>
+          <div class="item-row tbc"><div class="item-icon" style="background:#FFF3DC;color:#854F0B">&#9201;</div><span class="item-text">Payment on due + Relax time (True & Dtac)</span><span class="item-badge badge-tbc">TBC</span></div>
+          <div class="item-row tbc"><div class="item-icon" style="background:#FFF3DC;color:#854F0B">&#9201;</div><span class="item-text">Pre: accumulate under 25 THB & Excess Charge</span><span class="item-badge badge-tbc">TBC</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile -->
+    <div class="group-card">
+      <div class="group-head">
+        <div class="group-accent" style="background:#D4537E"></div>
+        <div class="group-name">Profile</div>
+        <span class="group-area" style="background:#FBEAF0;color:#993556">SLP</span>
+      </div>
+      <div class="group-body">
+        <div class="group-meta">
+          <span class="count-conf">&#10003; 1 confirmed</span>
+          <div class="mini-bar"><div class="mini-fill" style="width:100%;background:#D4537E"></div></div>
+          <span class="meta-count">1/1</span>
+        </div>
+        <div class="item-list">
+          <div class="item-row"><div class="item-icon" style="background:#FBEAF0;color:#993556">&#128101;</div><span class="item-text">Move Dtac customer to SLP</span><span class="item-badge badge-sep">1 Sep</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Privilege -->
+    <div class="group-card">
+      <div class="group-head">
+        <div class="group-accent" style="background:#7F77DD"></div>
+        <div class="group-name">Privilege</div>
+        <span class="group-area" style="background:#EEEDFE;color:#534AB7">SLP</span>
+      </div>
+      <div class="group-body">
+        <div class="group-meta">
+          <span class="count-conf">&#10003; 1 confirmed</span>
+          <div class="mini-bar"><div class="mini-fill" style="width:33%;background:#7F77DD"></div></div>
+          <span class="count-tbc">&#9201; 2 TBC</span>
+          <span class="meta-count">1/3</span>
+        </div>
+        <div class="item-list">
+          <div class="item-row"><div class="item-icon" style="background:#EEEDFE;color:#534AB7">&#127873;</div><span class="item-text">Migrate dtac campaign to SLP</span><span class="item-badge badge-sep">1 Sep</span></div>
+          <div class="item-row tbc"><div class="item-icon" style="background:#FFF3DC;color:#854F0B">&#9201;</div><span class="item-text">APRA Criteria</span><span class="item-badge badge-tbc">TBC</span></div>
+          <div class="item-row tbc"><div class="item-icon" style="background:#FFF3DC;color:#854F0B">&#9201;</div><span class="item-text">APRU Criteria</span><span class="item-badge badge-tbc">TBC</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Partner -->
+  <div class="full-card">
+    <div class="group-head">
+      <div class="group-accent" style="background:#BA7517"></div>
+      <div class="group-name">Partner</div>
+      <div class="group-meta" style="margin:0;flex:1;margin-left:14px">
+        <span class="count-conf">&#10003; 17 confirmed</span>
+        <div class="mini-bar"><div class="mini-fill" style="width:81%;background:#BA7517"></div></div>
+        <span class="count-tbc">&#9201; 4 TBC</span>
+        <span class="meta-count">17/21</span>
+      </div>
+      <span class="group-area" style="background:#FAEEDA;color:#854F0B">Partner</span>
+    </div>
+    <div class="group-body">
+      <div class="items-wrap">
+        <div class="item-row"><div class="item-icon" style="background:#FAEEDA;color:#854F0B">&#128241;</div><span class="item-text">TrueApp — Virtual Card & New Name</span><span class="item-badge badge-sep">1 Sep</span></div>
+        <div class="item-row tbc"><div class="item-icon" style="background:#FFF3DC;color:#854F0B">&#9201;</div><span class="item-text">TrueApp — Theme & New UI</span><span class="item-badge badge-tbc">TBC</span></div>
+        <div class="item-row"><div class="item-icon" style="background:#FAEEDA;color:#854F0B">&#128100;</div><span class="item-text">TrueID — Virtual Card & New Name</span><span class="item-badge badge-sep">1 Sep</span></div>
+        <div class="item-row tbc"><div class="item-icon" style="background:#FFF3DC;color:#854F0B">&#9201;</div><span class="item-text">TrueID — Theme & New UI</span><span class="item-badge badge-tbc">TBC</span></div>
+        <div class="item-row"><div class="item-icon" style="background:#FAEEDA;color:#854F0B">&#128722;</div><span class="item-text">TrueID — Dtac Redeem</span><span class="item-badge badge-sep">1 Sep</span></div>
+        <div class="item-row"><div class="item-icon" style="background:#FAEEDA;color:#854F0B">&#127760;</div><span class="item-text">TrueWeb — Virtual Card & New Name</span><span class="item-badge badge-sep">1 Sep</span></div>
+        <div class="item-row tbc"><div class="item-icon" style="background:#FFF3DC;color:#854F0B">&#9201;</div><span class="item-text">TrueWeb — Theme & New UI</span><span class="item-badge badge-tbc">TBC</span></div>
+        <div class="item-row"><div class="item-icon" style="background:#FAEEDA;color:#854F0B">&#128241;</div><span class="item-text">Dtac App (Dtac)</span><span class="item-badge badge-sep">1 Sep</span></div>
+        <div class="item-row tbc"><div class="item-icon" style="background:#FFF3DC;color:#854F0B">&#9201;</div><span class="item-text">APPONE (Dtac)</span><span class="item-badge badge-tbc">TBC</span></div>
+        <div class="item-row"><div class="item-icon" style="background:#FAEEDA;color:#854F0B">&#128222;</div><span class="item-text">USSD (Dtac)</span><span class="item-badge badge-sep">1 Sep</span></div>
+        <div class="item-row"><div class="item-icon" style="background:#FAEEDA;color:#854F0B">&#127911;</div><span class="item-text">IVR</span><span class="item-badge badge-sep">1 Sep</span></div>
+        <div class="item-row"><div class="item-icon" style="background:#FAEEDA;color:#854F0B">&#128279;</div><span class="item-text">Unify</span><span class="item-badge badge-sep">1 Sep</span></div>
+        <div class="item-row"><div class="item-icon" style="background:#FAEEDA;color:#854F0B">&#128203;</div><span class="item-text">Q System</span><span class="item-badge badge-sep">1 Sep</span></div>
+        <div class="item-row"><div class="item-icon" style="background:#FAEEDA;color:#854F0B">&#9679;</div><span class="item-text">TrueSphere</span><span class="item-badge badge-sep">1 Sep</span></div>
+        <div class="item-row"><div class="item-icon" style="background:#FAEEDA;color:#854F0B">&#128295;</div><span class="item-text">PA Tool (Car wash Dtac)</span><span class="item-badge badge-sep">1 Sep</span></div>
+        <div class="item-row"><div class="item-icon" style="background:#FAEEDA;color:#854F0B">&#127963;</div><span class="item-text">True Card Gateway (Corp)(Dtac)</span><span class="item-badge badge-sep">1 Sep</span></div>
+        <div class="item-row"><div class="item-icon" style="background:#FAEEDA;color:#854F0B">&#128451;</div><span class="item-text">DWH (Report)</span><span class="item-badge badge-sep">1 Sep</span></div>
+        <div class="item-row"><div class="item-icon" style="background:#FAEEDA;color:#854F0B">&#128421;</div><span class="item-text">IOM</span><span class="item-badge badge-sep">1 Sep</span></div>
+        <div class="item-row"><div class="item-icon" style="background:#FAEEDA;color:#854F0B">&#128101;</div><span class="item-text">CRM</span><span class="item-badge badge-sep">1 Sep</span></div>
+        <div class="item-row"><div class="item-icon" style="background:#FAEEDA;color:#854F0B">&#128196;</div><span class="item-text">Billing</span><span class="item-badge badge-sep">1 Sep</span></div>
+        <div class="item-row"><div class="item-icon" style="background:#FAEEDA;color:#854F0B">&#128179;</div><span class="item-text">Paynext TMN</span><span class="item-badge badge-sep">1 Sep</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Backlog -->
+  <div class="full-card">
+    <div class="group-head">
+      <div class="group-accent" style="background:#888780"></div>
+      <div class="group-name">Backlog</div>
+      <div class="group-meta" style="margin:0;flex:1;margin-left:14px">
+        <span class="count-tbc">&#9201; 10 TBC ทั้งหมด</span>
+        <div class="mini-bar"><div class="mini-fill" style="width:0%;background:#888780"></div></div>
+        <span class="meta-count">0/10</span>
+      </div>
+      <span class="group-area" style="background:#F1EFE8;color:#5F5E5A">Mix</span>
+    </div>
+    <div class="group-body">
+      <div class="items-wrap">
+        <div class="item-row tbc"><div class="item-icon" style="background:#FFF3DC;color:#854F0B">&#9201;</div><span class="item-text">Home ID</span><span class="item-badge badge-tbc">TBC</span></div>
+        <div class="item-row tbc"><div class="item-icon" style="background:#FFF3DC;color:#854F0B">&#9201;</div><span class="item-text">Mission unlock upper tier</span><span class="item-badge badge-tbc">TBC</span></div>
+        <div class="item-row tbc"><div class="item-icon" style="background:#FFF3DC;color:#854F0B">&#9201;</div><span class="item-text">DCB Prepaid (T&D) — Grading</span><span class="item-badge badge-tbc">TBC</span></div>
+        <div class="item-row tbc"><div class="item-icon" style="background:#FFF3DC;color:#854F0B">&#9201;</div><span class="item-text">DCB Prepaid (T&D) — TruePoint</span><span class="item-badge badge-tbc">TBC</span></div>
+        <div class="item-row tbc"><div class="item-icon" style="background:#FFF3DC;color:#854F0B">&#9201;</div><span class="item-text">TVS NOW — Grading</span><span class="item-badge badge-tbc">TBC</span></div>
+        <div class="item-row tbc"><div class="item-icon" style="background:#FFF3DC;color:#854F0B">&#9201;</div><span class="item-text">TVS NOW — TruePoint</span><span class="item-badge badge-tbc">TBC</span></div>
+        <div class="item-row tbc"><div class="item-icon" style="background:#FFF3DC;color:#854F0B">&#9201;</div><span class="item-text">TrueID — Grading</span><span class="item-badge badge-tbc">TBC</span></div>
+        <div class="item-row tbc"><div class="item-icon" style="background:#FFF3DC;color:#854F0B">&#9201;</div><span class="item-text">TrueID — TruePoint</span><span class="item-badge badge-tbc">TBC</span></div>
+        <div class="item-row tbc"><div class="item-icon" style="background:#FFF3DC;color:#854F0B">&#9201;</div><span class="item-text">TrueX — Grading</span><span class="item-badge badge-tbc">TBC</span></div>
+        <div class="item-row tbc"><div class="item-icon" style="background:#FFF3DC;color:#854F0B">&#9201;</div><span class="item-text">TrueX — TruePoint</span><span class="item-badge badge-tbc">TBC</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">SLP Phase 2 Checklist · Single Loyalty Platform · &copy; 2026</div>
+</div>
+
+<script>
+  const d = new Date();
+  document.getElementById('today').textContent = d.toLocaleDateString('th-TH', {day:'numeric', month:'long', year:'numeric'});
+</script>
+</body>
+</html>
