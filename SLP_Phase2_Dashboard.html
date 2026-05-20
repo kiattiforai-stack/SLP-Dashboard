@@ -124,10 +124,11 @@ function isSep(target) {
 
 function renderItem(item, style) {
   const sep = isSep(item.Target);
+  const label = sep ? item.Target : 'TBC';
   return `<div class="item-row ${sep ? '' : 'tbc'}">
     <div class="item-icon" style="background:${sep ? style.bg : '#FFF3DC'};color:${sep ? style.tx : '#854F0B'}">${sep ? '●' : '⏳'}</div>
     <span class="item-text">${item.Topic}</span>
-    <span class="item-badge ${sep ? 'badge-sep' : 'badge-tbc'}">${sep ? '1 Sep' : 'TBC'}</span>
+    <span class="item-badge ${sep ? 'badge-sep' : 'badge-tbc'}">${label}</span>
   </div>`;
 }
 
